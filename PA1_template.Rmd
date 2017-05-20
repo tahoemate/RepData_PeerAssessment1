@@ -41,10 +41,14 @@ print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ",steps.med
 
 ## What is the average daily activity pattern?
 
+First aggregate the data to average number of steps per interval.  Then plot a line chart fo the results.  Finally determine the interval with maximum average number of steps.
+
 ```{r}
 aggdata <- aggregate(data$steps, by=list(data$interval), FUN=mean, na.rm=T)
 names(aggdata) <- c("interval","steps")
-
+plot(aggdata,type="l",main="Average Steps per Interval",xlab="5 Minute Interval",ylab="Average Steps")
+maxrow <- aggdata[which.max(aggdata$steps),]
+print(paste( "Interval ", maxrow$interval, " with maximum average steps of ", as.integer(maxrow$steps)))
 ```
 
 
