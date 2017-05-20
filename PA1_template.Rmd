@@ -92,5 +92,29 @@ print(paste( "Mean Fixed Steps: ", as.integer(steps.fixed.mean),"  Median Fixed 
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```{r}
+weekday <- weekdays(as.Date(as.character(data$date)))
+weekday[weekday=="Monday"] <- "weekday"
+weekday[weekday=="Tuesday"] <- "weekday"
+weekday[weekday=="Wednesday"] <- "weekday"
+weekday[weekday=="Thursday"] <- "weekday"
+weekday[weekday=="Friday"] <- "weekday"
+weekday[weekday=="Saturday"] <- "weekend"
+weekday[weekday=="Sunday"] <- "weekend"
+weekday <- as.factor(weekday)
+
+data$weekday <- weekday  # assign co
+data <- na.omit(data)  # remove NA values
+
+data.weekday <- data[data$weekday=="weekday",]
+aggdata.weekday = aggregate(data.weekday$steps,by=list(data.weekday$interval),FUN=mean, na.rm=T)
+names(aggdata.weekday) <- c("interval","steps")
+plot(aggdata.weekday$interval, aggdata.weekday$steps,type="l")
+
+
+data.weekend <- data[data$weekday=="weekend",]
+aggdata.weekend = aggregate(data.weekend$steps,by=list(data.weekend$interval),FUN=mean, na.rm=T)
+names(aggdata.weekend) <- c("interval","steps")
+plot(aggdata.weekend$interval, aggdata.weekend$steps,type="l")
+
 ```
 
