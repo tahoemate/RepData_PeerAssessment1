@@ -35,9 +35,8 @@ names(aggdata) <- c("date","steps")
 hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day", xlab="Steps per Day",col=c("cadetblue1","aquamarine"))
 steps.mean <- mean(aggdata$steps)
 steps.median <- median(aggdata$steps)
-print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ",steps.median))
+print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ", steps.median))
 ```
-
 
 ## What is the average daily activity pattern?
 
@@ -51,14 +50,45 @@ maxrow <- aggdata[which.max(aggdata$steps),]
 print(paste( "Interval ", maxrow$interval, " with maximum average steps of ", as.integer(maxrow$steps)))
 ```
 
-
 ## Imputing missing values
 
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+2. Strategy to replace NA step values with median of steps taken during that period.
+
+3. Create a new dataset data.fixed that is equal to the original dataset but with the missing data filled in.
+
+4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
 ```{r}
-d2 <- na.omit(data)
+steps.missing <- sum(is.na(data$steps))
+print(paste("# Missing Steps: ", steps.missing))
+
+# Get median of steps aggregated by interval.
+aggdata <- aggregate(data$steps, by=list(data$interval), FUN=median, na.rm=T)
+names(aggdata) <- c("interval","steps")
+
+# Assign median steps to NA values at corresponding interval.
+data.fixed <- data
+for (i in which(is.na(data.fixed$steps))) {
+  data.fixed[i,1] <- aggdata[aggdata$interval==data.fixed[i,3],]$steps
+}
 ```
 
+In recomputing the mean and median, the mean rose slightly but the median stayed the same.
 
+```{r}
+# Aggregate fixed data total steps per day.
+aggdata <- aggregate(data.fixed$steps, by=list(data.fixed$date), FUN=sum, na.rm=T)
+names(aggdata) <- c("date","steps")
+
+hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day - Fixed", xlab="Steps per Day - Fixed Dataset",col=c("cadetblue1","aquamarine"))
+steps.fixed.mean <- mean(aggdata$steps)
+steps.fixed.median <- median(aggdata$steps)
+print(paste( "Mean Fixed Steps: ", as.integer(steps.fixed.mean),"  Median Fixed Steps: ", steps.fixed.median))
+```
 ## Are there differences in activity patterns between weekdays and weekends?
 
 ```{r}
