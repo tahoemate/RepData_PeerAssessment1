@@ -8,18 +8,55 @@ output:
 
 ## Loading and preprocessing the data
 
+First unzip and read the CSV file into a variable.
 
+The fields are:
+
++ **steps**: # of steps taken
+
++ **date**: in YYYY-MM-DD format
+
++ **interval**: 5 minute interval
+
+```{r}
+unzip("activity.zip")
+data <- read.csv("activity.csv")
+head(data)
+summary(data)
+```
 
 ## What is mean total number of steps taken per day?
 
+First aggregate the data and plot a histogram of the total steps per day.  Then compute the mean and median of steps per day.  It would appear that people who track their steps walk a lot farther than the average person.
+
+```{r}
+aggdata <- aggregate(data$steps, by=list(data$date), FUN=sum, na.rm=T)
+names(aggdata) <- c("date","steps")
+hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day", xlab="Steps per Day",col=c("cadetblue1","aquamarine"))
+steps.mean <- mean(aggdata$steps)
+steps.median <- median(aggdata$steps)
+print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ",steps.median))
+```
 
 
 ## What is the average daily activity pattern?
 
+```{r}
+aggdata <- aggregate(data$steps, by=list(data$interval), FUN=mean, na.rm=T)
+names(aggdata) <- c("interval","steps")
+
+```
 
 
 ## Imputing missing values
 
+```{r}
+d2 <- na.omit(data)
+```
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+```{r}
+```
+
