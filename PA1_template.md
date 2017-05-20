@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
@@ -18,37 +13,82 @@ The fields are:
 
 + **interval**: 5 minute interval
 
-```{r}
+
+```r
 unzip("activity.zip")
 data <- read.csv("activity.csv")
 head(data)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 summary(data)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 
 ## What is mean total number of steps taken per day?
 
 First aggregate the data and plot a histogram of the total steps per day.  Then compute the mean and median of steps per day.  It would appear that people who track their steps walk a lot farther than the average person.
 
-```{r}
+
+```r
 aggdata <- aggregate(data$steps, by=list(data$date), FUN=sum, na.rm=T)
 names(aggdata) <- c("date","steps")
 hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day", 
      xlab="Total Steps per Day",col=c("cadetblue1","aquamarine"))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 steps.mean <- mean(aggdata$steps)
 steps.median <- median(aggdata$steps)
 print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ", steps.median))
+```
+
+```
+## [1] "Mean Steps:  9354   Median Steps:  10395"
 ```
 
 ## What is the average daily activity pattern?
 
 First aggregate the data to average number of steps per interval.  Then plot a line chart fo the results.  Finally determine the interval with maximum average number of steps.
 
-```{r}
+
+```r
 aggdata <- aggregate(data$steps, by=list(data$interval), FUN=mean, na.rm=T)
 names(aggdata) <- c("interval","steps")
 plot(aggdata,type="l",main="Average Steps per Interval",xlab="5 Minute Interval",ylab="Average Steps")
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+```r
 maxrow <- aggdata[which.max(aggdata$steps),]
 print(paste( "Maximum interval is ", maxrow$interval, " with average steps of ", as.integer(maxrow$steps)))
+```
+
+```
+## [1] "Maximum interval is  835  with average steps of  206"
 ```
 
 ## Imputing missing values
@@ -63,10 +103,17 @@ Note that there are a number of days/intervals where there are missing values (c
 
 4. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
 
-```{r}
+
+```r
 steps.missing <- sum(is.na(data$steps))
 print(paste("# Missing Steps: ", steps.missing))
+```
 
+```
+## [1] "# Missing Steps:  2304"
+```
+
+```r
 # Get median of steps aggregated by interval.
 aggdata <- aggregate(data$steps, by=list(data$interval), FUN=median, na.rm=T)
 names(aggdata) <- c("interval","steps")
@@ -80,16 +127,26 @@ for (i in which(is.na(data.fixed$steps))) {
 
 In recomputing the mean and median, the mean rose slightly but the median stayed the same.
 
-```{r}
+
+```r
 # Aggregate fixed data total steps per day.
 aggdata <- aggregate(data.fixed$steps, by=list(data.fixed$date), FUN=sum, na.rm=T)
 names(aggdata) <- c("date","steps")
 
 hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day - Fixed", 
      xlab="Steps per Day - Fixed Dataset",col=c("cadetblue1","aquamarine"))
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+```r
 steps.fixed.mean <- mean(aggdata$steps)
 steps.fixed.median <- median(aggdata$steps)
 print(paste( "Mean Fixed Steps: ", as.integer(steps.fixed.mean),"  Median Fixed Steps: ", steps.fixed.median))
+```
+
+```
+## [1] "Mean Fixed Steps:  9503   Median Fixed Steps:  10395"
 ```
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -99,7 +156,8 @@ This relationship is even clearer when data is superimposed as shown in last plo
 
 Apparently these people are not spending all weekend at their computers taking CourseRA classes.  ;O
 
-```{r}
+
+```r
 # Convert day names to factors weekday/weekend.
 # Probably a much cooler way to do this...  ;/
 weekday <- weekdays(as.Date(as.character(data.fixed$date)))
@@ -127,7 +185,11 @@ plot(aggdata[aggdata$weekday=="weekday",]$interval,
 plot(aggdata[aggdata$weekday=="weekend",]$interval,
      aggdata[aggdata$weekday=="weekend",]$steps,type="l",
      xlab="5 Minute Interval", ylab="Avg Steps",main="Weekend (Sa,Su)")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
 par(mfrow=c(1,1))
 
 # bonus superimposed plot to see alternate view of data.
@@ -143,3 +205,5 @@ polygon(aggdata[aggdata$weekday=="weekend",]$interval,
 +      aggdata[aggdata$weekday=="weekend",]$steps, 
        col=rgb(1,0,0,.35), border=NA)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
