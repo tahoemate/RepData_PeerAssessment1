@@ -51,8 +51,8 @@ First aggregate the data and plot a histogram of the total steps per day.  Then 
 
 
 ```r
-aggdata <- aggregate(data$steps, by=list(data$date), FUN=sum, na.rm=T)
-names(aggdata) <- c("date","steps")
+aggdata <- aggregate(steps~date, data=data, FUN=sum, na.rm=T)
+# names(aggdata) <- c("date","steps")
 hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day", 
      xlab="Total Steps per Day",col=c("cadetblue1","aquamarine"))
 ```
@@ -66,7 +66,7 @@ print(paste( "Mean Steps: ", as.integer(steps.mean),"  Median Steps: ", steps.me
 ```
 
 ```
-## [1] "Mean Steps:  9354   Median Steps:  10395"
+## [1] "Mean Steps:  10766   Median Steps:  10765"
 ```
 
 ## What is the average daily activity pattern?
@@ -75,8 +75,8 @@ First aggregate the data to average number of steps per interval.  Then plot a l
 
 
 ```r
-aggdata <- aggregate(data$steps, by=list(data$interval), FUN=mean, na.rm=T)
-names(aggdata) <- c("interval","steps")
+aggdata <- aggregate(steps~interval, data=data, FUN=mean, na.rm=T)
+# names(aggdata) <- c("interval","steps")
 plot(aggdata,type="l",main="Average Steps per Interval",xlab="5 Minute Interval",ylab="Average Steps")
 ```
 
@@ -97,7 +97,7 @@ Note that there are a number of days/intervals where there are missing values (c
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-2. Strategy to replace NA step values with median of steps taken during that period.
+2. Strategy to replace NA step values with mean of steps taken during that period.
 
 3. Create a new dataset data.fixed that is equal to the original dataset but with the missing data filled in.
 
@@ -115,8 +115,8 @@ print(paste("# Missing Steps: ", steps.missing))
 
 ```r
 # Get median of steps aggregated by interval.
-aggdata <- aggregate(data$steps, by=list(data$interval), FUN=median, na.rm=T)
-names(aggdata) <- c("interval","steps")
+aggdata <- aggregate(steps~interval, data=data, FUN=mean, na.rm=T)
+#names(aggdata) <- c("interval","steps")
 
 # Assign median steps to NA values at corresponding interval.
 data.fixed <- data
@@ -125,13 +125,13 @@ for (i in which(is.na(data.fixed$steps))) {
 }
 ```
 
-In recomputing the mean and median, the mean rose slightly but the median stayed the same.
+In recomputing the mean and median the values did not change much.
 
 
 ```r
 # Aggregate fixed data total steps per day.
-aggdata <- aggregate(data.fixed$steps, by=list(data.fixed$date), FUN=sum, na.rm=T)
-names(aggdata) <- c("date","steps")
+aggdata <- aggregate(steps~date, data=data.fixed, FUN=sum, na.rm=T)
+#names(aggdata) <- c("date","steps")
 
 hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day - Fixed", 
      xlab="Steps per Day - Fixed Dataset",col=c("cadetblue1","aquamarine"))
@@ -142,11 +142,12 @@ hist(aggdata$steps, breaks=25, main="Histogram of Total Steps Per Day - Fixed",
 ```r
 steps.fixed.mean <- mean(aggdata$steps)
 steps.fixed.median <- median(aggdata$steps)
-print(paste( "Mean Fixed Steps: ", as.integer(steps.fixed.mean),"  Median Fixed Steps: ", steps.fixed.median))
+print(paste( "Mean Fixed Steps: ", as.integer(steps.fixed.mean),
+             "  Median Fixed Steps: ", as.integer(steps.fixed.median)))
 ```
 
 ```
-## [1] "Mean Fixed Steps:  9503   Median Fixed Steps:  10395"
+## [1] "Mean Fixed Steps:  10766   Median Fixed Steps:  10766"
 ```
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -173,10 +174,10 @@ weekday <- as.factor(weekday)
 data.fixed$weekday <- weekday  # assign column
 
 # Aggregate the data to get average number of steps by interval and weekday factor.
-aggdata = aggregate(data.fixed$steps,
-                    by=list(data.fixed$interval,data.fixed$weekday),
+aggdata = aggregate(steps~interval+weekday,
+                    data=data.fixed,
                     FUN=mean, na.rm=T)
-names(aggdata) <- c("interval","weekday","steps")
+#names(aggdata) <- c("interval","weekday","steps")
 
 par(mfrow=c(2,1))
 plot(aggdata[aggdata$weekday=="weekday",]$interval,
